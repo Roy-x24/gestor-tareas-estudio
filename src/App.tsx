@@ -17,6 +17,7 @@ export default function App() {
   const [filterPriority, setFilterPriority] = useState<Priority | "Todas">(
     "Todas"
   );
+  const [sortByDeadline, setSortByDeadline] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -26,7 +27,7 @@ export default function App() {
 
   const filteredTasks = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return tasks.filter((t) => {
+    const result = tasks.filter((t) => {
       if (filterStatus !== "Todas" && t.status !== filterStatus) return false;
       if (filterPriority !== "Todas" && t.priority !== filterPriority)
         return false;
@@ -37,7 +38,18 @@ export default function App() {
       }
       return true;
     });
-  }, [tasks, search, filterStatus, filterPriority]);
+
+    if (sortByDeadline) {
+      result.sort((a, b) => {
+        if (!a.deadline && !b.deadline) return 0;
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return a.deadline.localeCompare(b.deadline);
+      });
+    }
+
+    return result;
+  }, [tasks, search, filterStatus, filterPriority, sortByDeadline]);
 
   const openNewForm = () => {
     setEditingTask(null);
@@ -67,11 +79,6 @@ export default function App() {
     deleteCompletedTasks();
     setConfirmOpen(false);
   };
-
-  const hasFilters =
-    search.trim() !== "" ||
-    filterStatus !== "Todas" ||
-    filterPriority !== "Todas";
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -106,6 +113,8 @@ export default function App() {
           onFilterStatusChange={setFilterStatus}
           filterPriority={filterPriority}
           onFilterPriorityChange={setFilterPriority}
+          sortByDeadline={sortByDeadline}
+          onSortByDeadlineChange={setSortByDeadline}
           onNewTask={openNewForm}
           onClearCompleted={() => setConfirmOpen(true)}
           completedCount={completedCount}

@@ -1,4 +1,4 @@
-import { Search, Plus, Filter, Trash2 } from "lucide-react";
+import { Search, Plus, Filter, Trash2, ArrowDownUp } from "lucide-react";
 import type { Priority, Status } from "@/types";
 import { PRIORITIES, STATUSES } from "@/types";
 
@@ -9,6 +9,8 @@ interface ToolbarProps {
   onFilterStatusChange: (value: Status | "Todas") => void;
   filterPriority: Priority | "Todas";
   onFilterPriorityChange: (value: Priority | "Todas") => void;
+  sortByDeadline: boolean;
+  onSortByDeadlineChange: (value: boolean) => void;
   onNewTask: () => void;
   onClearCompleted: () => void;
   completedCount: number;
@@ -23,6 +25,8 @@ export function Toolbar({
   onFilterStatusChange,
   filterPriority,
   onFilterPriorityChange,
+  sortByDeadline,
+  onSortByDeadlineChange,
   onNewTask,
   onClearCompleted,
   completedCount,
@@ -93,6 +97,22 @@ export function Toolbar({
                 {p}
               </option>
             ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-2 sm:ml-2">
+          <ArrowDownUp size={16} className="text-slate-400" />
+          <label htmlFor="sort-order" className="sr-only">
+            Ordenar tareas
+          </label>
+          <select
+            id="sort-order"
+            value={sortByDeadline ? "deadline" : "default"}
+            onChange={(e) => onSortByDeadlineChange(e.target.value === "deadline")}
+            className={selectClass}
+          >
+            <option value="default">Orden original</option>
+            <option value="deadline">Fecha límite (más cercana)</option>
           </select>
         </div>
 
